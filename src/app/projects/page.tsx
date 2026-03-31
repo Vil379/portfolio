@@ -32,7 +32,7 @@ export default async function ProjectsPage() {
             href={`/projects/${project.slug}`}
             className="group block bg-white border border-gray-100 rounded-3xl overflow-hidden hover:shadow-2xl hover:border-gray-200 transition-all duration-300"
           >
-            <div className="aspect-auto bg-gray-100 relative overflow-hidden">
+            <div className="aspect-video bg-gray-100 relative overflow-hidden">
               {project.mainImage ? (
                 <Image
                   src={urlFor(project.mainImage).url()}

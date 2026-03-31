@@ -2,6 +2,8 @@
 import Link from "next/link";
 import { client } from "../../../sanity/lib/client";
 
+export const revalidate = 10;
+
 async function getProject(slug: string) {
   // ดึงข้อมูลเฉพาะโปรเจกต์ที่ slug ตรงกัน
   const query = `*[_type == "project" && slug.current == $slug][0] {
@@ -52,7 +54,7 @@ export default async function ProjectDetailsPage({
               ))}
             </div>
           </aside>
-          
+
           <div className="lg:col-span-3 space-y-12">
             <section>
               <h2 className="text-2xl font-bold mb-4">
