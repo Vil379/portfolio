@@ -4,6 +4,8 @@ import Link from "next/link";
 import { client } from "../../sanity/lib/client";
 import { urlFor } from "../../sanity/lib/image";
 
+export const revalidate = 10;
+
 async function getAllProjects() {
   const query = `*[_type == "project"] | order(_createdAt desc) {
     _id,

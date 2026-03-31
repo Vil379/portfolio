@@ -3,6 +3,7 @@ import Link from "next/link";
 import { client } from "../sanity/lib/client"; // ปรับ Path ให้ตรงกับที่อยู่ไฟล์ client ของคุณ
 import { urlFor } from "../sanity/lib/image"; // ปรับ Path ให้ตรงกับที่อยู่ไฟล์ image ของคุณ
 
+export const revalidate = 10;
 // ดึงข้อมูลโปรเจกต์ 2 อันล่าสุด
 async function getProjects() {
   const query = `*[_type == "project"][0...2] | order(_createdAt desc) {
@@ -52,15 +53,23 @@ export default async function Home() {
       {/* ส่วนที่ 2: ผลงาน (Projects Section) */}
       <section className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-10 border-b border-gray-100 pb-4">
-          <h3 className="text-3xl font-bold text-gray-900">Selected Projects</h3>
-          <Link href="/projects" className="text-blue-600 font-medium hover:text-blue-800 hidden md:block">
+          <h3 className="text-3xl font-bold text-gray-900">
+            Selected Projects
+          </h3>
+          <Link
+            href="/projects"
+            className="text-blue-600 font-medium hover:text-blue-800 hidden md:block"
+          >
             ดูทั้งหมด &rarr;
           </Link>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {projects.map((project: any) => (
-            <div key={project._id} className="group border border-gray-200 rounded-2xl p-8 hover:shadow-xl hover:border-blue-100 transition-all duration-300 bg-white flex flex-col h-full">
+            <div
+              key={project._id}
+              className="group border border-gray-200 rounded-2xl p-8 hover:shadow-xl hover:border-blue-100 transition-all duration-300 bg-white flex flex-col h-full"
+            >
               <div className="mb-4">
                 <span className="text-xs font-bold uppercase tracking-widest text-blue-600 bg-blue-50 px-3 py-1.5 rounded-full">
                   Portfolio
