@@ -68,7 +68,7 @@ export default async function Home() {
                 {project.description}
               </p>
               <Link
-                href={`/projects/${project.slug}`}
+                href={`/projects#${project.slug}`} // เติมเครื่องหมาย # เข้าไป
                 className="text-blue-600 font-semibold hover:text-blue-800 inline-flex items-center mt-auto"
               >
                 ดูรายละเอียด <span className="ml-2">&rarr;</span>

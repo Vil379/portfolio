@@ -10,6 +10,7 @@ async function getAllProjects() {
   const query = `*[_type == "project"] | order(_createdAt desc) {
     _id, 
     title, 
+    "slug": slug.current,
     description, 
     mainImage,
     challenge,
@@ -32,6 +33,7 @@ export default async function ProjectsPage() {
         {projects.map((project: any) => (
           <article
             key={project._id}
+            id={project.slug}
             className="bg-white border border-gray-100 rounded-3xl p-8 md:p-12 shadow-sm hover:shadow-md transition-shadow"
           >
             {/* ส่วนหัว: ชื่อและคำอธิบาย */}
