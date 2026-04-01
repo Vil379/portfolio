@@ -1,12 +1,12 @@
 // src/components/Navbar.tsx
 import Link from "next/link";
+import Button from "./ui/Button";
 
 const Navbar = () => {
   const navLinks = [
     { name: "หน้าแรก", href: "/" },
     { name: "ผลงาน", href: "/projects" },
     { name: "บริการ", href: "/services" },
-    { name: "เกี่ยวกับผม", href: "/about" },
     { name: "ติดต่อ", href: "/contact" },
   ];
 
@@ -29,12 +29,10 @@ const Navbar = () => {
               {link.name}
             </Link>
           ))}
-          <Link
-            href="/contact"
-            className="bg-blue-600 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-blue-700 transition-colors shadow-sm"
-          >
+          <Button href="/contact" size="sm">
             คุยงาน
-          </Link>
+          </Button>{" "}
+          
         </div>
       </div>
     </nav>

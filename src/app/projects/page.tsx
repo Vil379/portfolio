@@ -8,11 +8,7 @@ export const revalidate = 10;
 
 async function getAllProjects() {
   const query = `*[_type == "project"] | order(_createdAt desc) {
-    _id,
-    title,
-    "slug": slug.current,
-    description,
-    mainImage
+    _id, title, "slug": slug.current, description, mainImage
   }`;
   return client.fetch(query);
 }
