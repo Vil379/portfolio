@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { client } from "../sanity/lib/client";
 import Button from "../components/ui/Button"; // <-- นำเข้า Button
+import FaizHero from "../components/FaizHero";
 
 export const revalidate = 10;
 
@@ -16,29 +17,9 @@ export default async function Home() {
   const projects = await getProjects();
 
   return (
-    <main className="min-h-screen bg-white text-gray-900 px-6 py-12 md:py-24">
+    <main className="min-h-screen text-gray-900 px-6 py-12 md:py-24">
       {/* Hero Section */}
-      <section className="mb-24 max-w-4xl mx-auto mt-10 md:mt-20">
-        <h1 className="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight">
-          สวัสดีครับ ผม Vil 👋
-        </h1>
-        <h2 className="text-2xl md:text-4xl text-blue-600 mb-8 font-semibold tracking-tight">
-          Freelance Web Developer
-        </h2>
-        <p className="text-lg md:text-xl text-gray-600 max-w-2xl leading-relaxed mb-10">
-          ผมรับออกแบบและพัฒนาเว็บไซต์ที่ตอบโจทย์ธุรกิจของคุณ ตั้งแต่หน้าเว็บ
-          Portfolio ไปจนถึงระบบแพลตฟอร์มที่ซับซ้อน มุ่งเน้นประสิทธิภาพ
-          ความรวดเร็ว และมอบประสบการณ์ที่ดีที่สุดให้กับผู้ใช้งาน
-        </p>
-        <div className="flex flex-wrap gap-4">
-          <Button href="/projects" size="lg">
-            ดูผลงานของผม
-          </Button>
-          <Button href="/contact" variant="outline" size="lg">
-            ติดต่องาน
-          </Button>
-        </div>
-      </section>
+      <FaizHero />
 
       {/* Projects Section */}
       <section className="max-w-4xl mx-auto">
