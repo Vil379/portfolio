@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Button from "./ui/Button";
 
@@ -8,34 +8,44 @@ export default function FaizHero() {
   const [phase, setPhase] = useState<"idle" | "standing_by" | "complete">(
     "idle",
   );
-  const keyBuffer = useRef("");
+  const [displayCode, setDisplayCode] = useState("");
+  const [isKeypadOpen, setIsKeypadOpen] = useState(false); // 👈 State ใหม่สำหรับเปิด/ปิดแป้นพิมพ์
+
+  const handleVirtualKey = (key: string) => {
+    if (phase === "complete" && (key === "Backspace" || key === "Cancel")) {
+      triggerDeformation();
+      return;
+    }
+
+    if (phase !== "idle") return;
+
+    if (key === "Enter") {
+      if (displayCode.endsWith("555")) {
+        triggerHenshin();
+        setIsKeypadOpen(false); // ปิดแป้นพิมพ์ตอนเริ่มแปลงร่าง
+      } else {
+        setDisplayCode("");
+      }
+    } else if (key === "Backspace") {
+      setDisplayCode((prev) => prev.slice(0, -1));
+    } else if (/^[0-9]$/.test(key)) {
+      setDisplayCode((prev) => (prev + key).slice(-10));
+    }
+  };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // 1. ดักจับปุ่มลบ (Backspace) เพื่อคืนร่าง
-      if (phase === "complete" && e.key === "Backspace") {
-        triggerDeformation();
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement
+      )
         return;
-      }
-
-      if (phase !== "idle") return;
-
-      if (e.key === "Enter") {
-        if (keyBuffer.current.endsWith("555")) {
-          triggerHenshin();
-        }
-        keyBuffer.current = "";
-      } else if (e.key.length === 1) {
-        keyBuffer.current += e.key;
-        if (keyBuffer.current.length > 10) {
-          keyBuffer.current = keyBuffer.current.slice(-10);
-        }
-      }
+      handleVirtualKey(e.key);
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [phase]);
+  }, [phase, displayCode]);
 
   const triggerHenshin = () => {
     setPhase("standing_by");
@@ -48,18 +58,16 @@ export default function FaizHero() {
       const completeAudio = new Audio("/sounds/complete.mp3");
       completeAudio.volume = 0.5;
       completeAudio.play();
-    }, 5830);
+    }, 5840);
   };
 
-  // ฟังก์ชันใหม่: คืนร่างเดิม
   const triggerDeformation = () => {
-    // 1. เล่นเสียงปลดล็อก/คืนร่าง
     const deformationAudio = new Audio("/sounds/deformation.mp3");
     deformationAudio.volume = 0.5;
     deformationAudio.play();
 
-    // 2. ปรับสถานะกลับเป็นโหมดปกติ
     setPhase("idle");
+    setDisplayCode("");
     window.dispatchEvent(new Event("faiz-revert"));
   };
 
@@ -73,36 +81,19 @@ export default function FaizHero() {
 
   return (
     <section className="relative mb-24 max-w-4xl mx-auto mt-10 md:mt-20 z-10 p-6 transition-colors duration-1000">
-      {/* เพิ่มคำแนะนำปุ่มลบ ให้ลูกค้าเห็นลางๆ ตอนแปลงร่างแล้ว */}
-      {isTransformed && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 2 }}
-          className="fixed bottom-4 right-6 text-xs font-mono text-red-900/50 hover:text-red-500 transition-colors z-50 cursor-default"
-        >
-          [ PRESS 'BACKSPACE' TO CANCEL ]
-        </motion.div>
-      )}
-
-      {phase === "idle" && (
-        <div className="fixed bottom-4 right-6 text-xs font-mono text-gray-400/50 hover:text-gray-400 transition-colors z-50">
-          [ SYS_READY: input_code 555 Enter &crarr; ]
-        </div>
-      )}
-
+      {/* --- ส่วน Background สีมืด และ เส้นแสง Photon Blood --- */}
       <AnimatePresence>
         {isTransformed && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0, transition: { duration: 1 } }} // 👈 เพิ่มการเฟดออกตอนคืนร่าง
+            exit={{ opacity: 0, transition: { duration: 1 } }}
             className="fixed inset-0 z-[-1] bg-neutral-950"
           >
             <motion.div
               initial={{ height: 0 }}
               animate={{ height: "100vh" }}
-              exit={{ opacity: 0, transition: { duration: 0.5 } }} // 👈 ให้เส้นแสงหายไปตอนคืนร่าง
+              exit={{ opacity: 0, transition: { duration: 0.5 } }}
               transition={{ duration: 1.2, ease: "easeOut" }}
               className="absolute left-1/2 top-0 w-1 md:w-2 -ml-0.5 md:-ml-1 bg-red-500 shadow-[0_0_20px_8px_rgba(255,0,0,0.8)]"
             />
@@ -117,6 +108,7 @@ export default function FaizHero() {
         )}
       </AnimatePresence>
 
+      {/* --- ส่วนเนื้อหาหลัก --- */}
       <div
         className={`transition-colors duration-1000 relative z-10 ${isTransformed ? "text-white" : "text-gray-900"}`}
       >
@@ -136,7 +128,7 @@ export default function FaizHero() {
           ความรวดเร็ว และมอบประสบการณ์ที่ดีที่สุดให้กับผู้ใช้งาน
         </p>
 
-        {/* --- ปุ่มปกติ (โชว์และซ่อนพร้อมเอฟเฟกต์) --- */}
+        {/* ปุ่มติดต่องานปกติ (ซ่อนตอนแปลงร่าง) */}
         <AnimatePresence mode="wait">
           {phase === "idle" && (
             <motion.div
@@ -144,51 +136,147 @@ export default function FaizHero() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="flex flex-wrap gap-4 mt-8"
             >
-              <Button href="/projects" size="lg">
-                ดูผลงานของผม
-              </Button>
-              <Button href="/contact" variant="outline" size="lg">
-                ติดต่องาน
-              </Button>
+              <div className="flex flex-wrap gap-4 mt-8">
+                <Button href="/projects" size="lg">
+                  ดูผลงานของผม
+                </Button>
+                <Button href="/contact" variant="outline" size="lg">
+                  ติดต่องาน
+                </Button>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
 
+        {/* สถานะ Standing By */}
         {phase === "standing_by" && (
           <div className="mt-12 h-14 flex items-center">
             <motion.p
               animate={{ opacity: [1, 0.3, 1] }}
               transition={{ repeat: Infinity, duration: 0.8 }}
-              className="text-2xl font-mono font-bold text-red-600 tracking-widest uppercase drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]"
+              className="text-2xl md:text-3xl font-mono font-bold text-red-600 tracking-widest uppercase drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]"
             >
               [ Standing By... ]
             </motion.p>
           </div>
         )}
 
+        {/* สถานะ Complete */}
         <AnimatePresence mode="wait">
           {phase === "complete" && (
             <motion.div
-              key="complete-buttons"
+              key="complete-ui"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
               transition={{ delay: 1.5 }}
-              className="flex flex-wrap gap-4 mt-12"
+              className="flex flex-col gap-6 mt-12"
             >
-              <Button
-                href="/projects"
-                size="lg"
-                className="bg-red-600 hover:bg-red-700 text-white shadow-[0_0_20px_rgba(239,68,68,0.5)] border-none"
+              <div className="flex flex-wrap gap-4">
+                <Button
+                  href="/projects"
+                  size="lg"
+                  className="bg-red-600 hover:bg-red-700 text-white shadow-[0_0_20px_rgba(239,68,68,0.5)] border-none"
+                >
+                  ดูผลงานทั้งหมด (System Overrided)
+                </Button>
+              </div>
+              <button
+                onClick={() => handleVirtualKey("Cancel")}
+                className="w-fit text-sm font-mono text-red-500 hover:text-white border border-red-900/50 hover:bg-red-600/20 px-4 py-2 rounded-lg transition-colors"
               >
-                ดูผลงานทั้งหมด (System Overrided)
-              </Button>
+                [ DISCONNECT ]
+              </button>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
+
+      {/* ---------------- แป้นพิมพ์ลอยตัว (Floating Keypad) มุมขวาล่าง ---------------- */}
+      {phase === "idle" && (
+        <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+          {/* ตัวกรอบแป้นพิมพ์ (จะโผล่มาเมื่อ isKeypadOpen เป็น true) */}
+          <AnimatePresence>
+            {isKeypadOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 20, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+                className="mb-4 bg-white/95 backdrop-blur-md border border-gray-200 p-4 rounded-3xl shadow-2xl w-65 md:w-70"
+              >
+                {/* แถบด้านบน (หัวข้อ + ปุ่มปิด) */}
+                <div className="flex justify-between items-center mb-3 px-1">
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                    Smart Brain 555 faiz
+                  </p>
+                  <button
+                    onClick={() => setIsKeypadOpen(false)}
+                    className="text-gray-400 hover:text-red-500 font-bold w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 hover:bg-red-50 transition-colors"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                {/* หน้าจอแสดงผลเลข */}
+                <div className="bg-gray-900 rounded-xl p-3 mb-4 h-14 flex items-center justify-center overflow-hidden shadow-inner">
+                  <span className="text-red-500 font-mono text-2xl tracking-[0.3em] font-bold">
+                    {displayCode ? (
+                      displayCode
+                    ) : (
+                      <span className="text-gray-700">_ _ _</span>
+                    )}
+                  </span>
+                </div>
+
+                {/* แป้นตัวเลข */}
+                <div className="grid grid-cols-3 gap-2">
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+                    <button
+                      key={num}
+                      onClick={() => handleVirtualKey(num.toString())}
+                      className="bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-800 text-lg font-bold py-2.5 rounded-xl transition-colors shadow-sm"
+                    >
+                      {num}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => handleVirtualKey("Backspace")}
+                    className="bg-red-50 hover:bg-red-100 active:bg-red-200 text-red-600 text-sm font-bold py-2.5 rounded-xl transition-colors shadow-sm"
+                  >
+                    DEL
+                  </button>
+                  <button
+                    onClick={() => handleVirtualKey("0")}
+                    className="bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-800 text-lg font-bold py-2.5 rounded-xl transition-colors shadow-sm"
+                  >
+                    0
+                  </button>
+                  <button
+                    onClick={() => handleVirtualKey("Enter")}
+                    className="bg-gray-900 hover:bg-black active:scale-95 text-white text-sm font-bold py-2.5 rounded-xl transition-transform shadow-sm"
+                  >
+                    ENT
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* ปุ่มเปิด/ปิด แบบข้อความลับๆ */}
+          <button
+            onClick={() => setIsKeypadOpen(!isKeypadOpen)}
+            className={`text-xs font-mono font-semibold transition-colors px-3 py-1.5 rounded-full border border-transparent hover:border-gray-200 hover:bg-white/50 ${
+              isKeypadOpen
+                ? "text-red-500"
+                : "text-gray-400/60 hover:text-gray-600"
+            }`}
+          >
+            {isKeypadOpen ? "[ CLOSE_SYS ]" : "[ SYS_READY 555 ]"}
+          </button>
+        </div>
+      )}
     </section>
   );
 }
