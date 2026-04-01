@@ -2,10 +2,9 @@
 import Link from "next/link";
 import { client } from "../../../sanity/lib/client";
 
-export const revalidate = 10;
+export const revalidate = 10; // อย่าลืมใส่ตัวนี้ด้วยครับ
 
 async function getProject(slug: string) {
-  // ดึงข้อมูลเฉพาะโปรเจกต์ที่ slug ตรงกัน
   const query = `*[_type == "project" && slug.current == $slug][0] {
     title,
     challenge,
@@ -15,15 +14,28 @@ async function getProject(slug: string) {
   return client.fetch(query, { slug });
 }
 
+// 1. เปลี่ยน Type ของ params ให้เป็น Promise (ตามกฎ Next.js ใหม่)
 export default async function ProjectDetailsPage({
   params,
 }: {
-  params: { projectId: string };
+  params: Promise<{ projectId: string }>;
 }) {
-  const projectData = await getProject(params.projectId);
+  // 2. ใช้ await เพื่อแกะค่า params ออกมาก่อนใช้งาน
+  const resolvedParams = await params;
+  const projectData = await getProject(resolvedParams.projectId);
 
   if (!projectData) {
-    return <main className="text-center py-20">ไม่พบข้อมูลโปรเจกต์</main>;
+    return (
+      <main className="text-center py-20">
+        <h2 className="text-2xl font-bold mb-4">ไม่พบข้อมูลโปรเจกต์</h2>
+        <p className="text-gray-500">
+          โปรดตรวจสอบว่าใน Sanity ได้กดปุ่ม Generate Slug แล้วหรือยัง
+        </p>
+        <Link href="/projects" className="text-blue-600 mt-4 inline-block">
+          &larr; กลับหน้าหลัก
+        </Link>
+      </main>
+    );
   }
 
   return (
