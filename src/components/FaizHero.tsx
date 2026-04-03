@@ -229,7 +229,12 @@ export default function FaizHero() {
       </div>
 
       {phase === "idle" && (
-        <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.5, type: "spring", stiffness: 100 }}
+          className="fixed bottom-6 right-6 z-50 flex flex-col items-end"
+        >
           <AnimatePresence>
             {isKeypadOpen && (
               <motion.div
@@ -237,7 +242,7 @@ export default function FaizHero() {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 20, scale: 0.95 }}
                 transition={{ duration: 0.2 }}
-                className="mb-4 bg-card/95 backdrop-blur-md border border-border-card p-4 rounded-3xl shadow-2xl w-65"
+                className="mb-4 bg-card/95 backdrop-blur-md border border-border-card p-4 rounded-3xl shadow-2xl w-65 md:w-70"
               >
                 <div className="flex justify-between items-center mb-3 px-1">
                   <p className="text-xs font-bold text-text-muted uppercase tracking-widest">
@@ -315,10 +320,10 @@ export default function FaizHero() {
                   : "group-hover:text-foreground transition-colors"
               }
             >
-              {isKeypadOpen ? "CLOSE_SYS" : "SYS_READY"}
+              {isKeypadOpen ? "CLOSE_SYS" : "SYS_READY [ _ _ _ ]"}
             </span>
           </button>
-        </div>
+        </motion.div>
       )}
     </section>
   );
