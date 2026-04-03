@@ -1,8 +1,6 @@
-// src/components/ui/Button.tsx
 import Link from "next/link";
 import { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from "react";
 
-// รวม Props ของ Button และ Link
 type BaseProps = {
   children: ReactNode;
   variant?: "primary" | "secondary" | "outline";
@@ -24,19 +22,21 @@ const Button = ({
   ...props
 }: ButtonProps | AnchorProps) => {
   const baseClass =
-    "inline-flex items-center justify-center font-semibold transition-colors duration-200 rounded-full";
+    "inline-flex items-center justify-center font-medium transition-all duration-300 rounded-full";
 
   const variants = {
-    primary: "bg-blue-600 text-white hover:bg-blue-700 shadow-sm",
-    secondary: "bg-gray-100 text-gray-900 hover:bg-gray-200",
+    // โหมดสว่างจะเป็นปุ่มดำ/ตัวหนังสือขาว, โหมดมืดจะเป็นปุ่มขาว/ตัวหนังสือดำ สลับกันอัตโนมัติ
+    primary:
+      "bg-foreground text-background hover:opacity-80 hover:shadow-lg hover:-translate-y-0.5",
+    secondary: "bg-muted text-foreground hover:brightness-95",
     outline:
-      "border-2 border-gray-200 text-gray-700 hover:border-gray-300 hover:text-gray-900 bg-white",
+      "border border-border-card text-text-muted hover:border-foreground hover:text-foreground bg-transparent",
   };
 
   const sizes = {
-    sm: "px-4 py-2 text-sm",
+    sm: "px-5 py-2 text-sm",
     md: "px-6 py-3 text-base",
-    lg: "px-8 py-3.5 text-base md:text-lg", // ปรับให้เหมาะกับ Hero Section
+    lg: "px-8 py-3.5 text-base md:text-lg",
   };
 
   const combinedClasses = `${baseClass} ${variants[variant]} ${sizes[size]} ${className}`;
