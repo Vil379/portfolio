@@ -4,12 +4,26 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Button from "./ui/Button";
 
+// ฟังก์ชันตัวช่วยสำหรับเล่นเสียง (เอาไว้ข้างนอก Component เพื่อไม่ให้โหลดใหม่ซ้ำๆ)
+const playSound = (soundPath: string, volume: number = 0.4) => {
+  const audio = new Audio(soundPath);
+  audio.volume = volume;
+  // ใช้ catch เพื่อป้องกัน Error ในเบราว์เซอร์บางตัวที่บล็อกเสียง
+  audio.play().catch((err) => console.log("Audio play blocked:", err));
+};
+
 export default function FaizHero() {
   const [phase, setPhase] = useState<"idle" | "standing_by" | "complete">(
     "idle",
   );
   const [displayCode, setDisplayCode] = useState("");
-  const [isKeypadOpen, setIsKeypadOpen] = useState(false); // 👈 State ใหม่สำหรับเปิด/ปิดแป้นพิมพ์
+  const [isKeypadOpen, setIsKeypadOpen] = useState(false);
+
+  // ฟังก์ชันเปิด/ปิดแป้นพิมพ์ พร้อมเสียง
+  const toggleKeypad = () => {
+    playSound("/sounds/open.mp3", 0.5); // 👈 เล่นเสียงเปิดจอ
+    setIsKeypadOpen(!isKeypadOpen);
+  };
 
   const handleVirtualKey = (key: string) => {
     if (phase === "complete" && (key === "Backspace" || key === "Cancel")) {
@@ -19,10 +33,15 @@ export default function FaizHero() {
 
     if (phase !== "idle") return;
 
+    // 👈 เล่นเสียงปิ๊บ ทุกครั้งที่มีการกดปุ่ม (ยกเว้นกดรหัสถูกแล้วเดี๋ยวเสียงมันจะตีกับ Standing By)
+    if (key !== "Enter" || !displayCode.endsWith("555")) {
+      playSound("/sounds/beep.mp3", 0.3);
+    }
+
     if (key === "Enter") {
       if (displayCode.endsWith("555")) {
         triggerHenshin();
-        setIsKeypadOpen(false); // ปิดแป้นพิมพ์ตอนเริ่มแปลงร่าง
+        setIsKeypadOpen(false);
       } else {
         setDisplayCode("");
       }
@@ -49,22 +68,16 @@ export default function FaizHero() {
 
   const triggerHenshin = () => {
     setPhase("standing_by");
-    const standingByAudio = new Audio("/sounds/standing_by.mp3");
-    standingByAudio.volume = 0.5;
-    standingByAudio.play();
+    playSound("/sounds/standing_by.mp3", 0.6); // 👈 ปรับการเรียกใช้เสียง
 
     setTimeout(() => {
       setPhase("complete");
-      const completeAudio = new Audio("/sounds/complete.mp3");
-      completeAudio.volume = 0.5;
-      completeAudio.play();
-    }, 5840);
+      playSound("/sounds/complete.mp3", 0.6); // 👈 ปรับการเรียกใช้เสียง
+    }, 3200);
   };
 
   const triggerDeformation = () => {
-    const deformationAudio = new Audio("/sounds/deformation.mp3");
-    deformationAudio.volume = 0.5;
-    deformationAudio.play();
+    playSound("/sounds/deformation.mp3", 0.6); // 👈 ปรับการเรียกใช้เสียง
 
     setPhase("idle");
     setDisplayCode("");
@@ -95,7 +108,7 @@ export default function FaizHero() {
               animate={{ height: "100vh" }}
               exit={{ opacity: 0, transition: { duration: 0.5 } }}
               transition={{ duration: 1.2, ease: "easeOut" }}
-              className="absolute left-1/2 top-0 w-1 md:w-2 -ml-0.5 md:-ml-1 bg-red-500 shadow-[0_0_20px_8px_rgba(255,0,0,0.8)]"
+              className="absolute left-1/2 top-0 w-1 md:w-2 -0.5 md:-ml-1 bg-red-500 shadow-[0_0_20px_8px_rgba(255,0,0,0.8)]"
             />
             <motion.div
               initial={{ width: 0 }}
@@ -128,7 +141,6 @@ export default function FaizHero() {
           ความรวดเร็ว และมอบประสบการณ์ที่ดีที่สุดให้กับผู้ใช้งาน
         </p>
 
-        {/* ปุ่มติดต่องานปกติ (ซ่อนตอนแปลงร่าง) */}
         <AnimatePresence mode="wait">
           {phase === "idle" && (
             <motion.div
@@ -149,7 +161,6 @@ export default function FaizHero() {
           )}
         </AnimatePresence>
 
-        {/* สถานะ Standing By */}
         {phase === "standing_by" && (
           <div className="mt-12 h-14 flex items-center">
             <motion.p
@@ -162,7 +173,6 @@ export default function FaizHero() {
           </div>
         )}
 
-        {/* สถานะ Complete */}
         <AnimatePresence mode="wait">
           {phase === "complete" && (
             <motion.div
@@ -196,7 +206,6 @@ export default function FaizHero() {
       {/* ---------------- แป้นพิมพ์ลอยตัว (Floating Keypad) มุมขวาล่าง ---------------- */}
       {phase === "idle" && (
         <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
-          {/* ตัวกรอบแป้นพิมพ์ (จะโผล่มาเมื่อ isKeypadOpen เป็น true) */}
           <AnimatePresence>
             {isKeypadOpen && (
               <motion.div
@@ -206,20 +215,18 @@ export default function FaizHero() {
                 transition={{ duration: 0.2 }}
                 className="mb-4 bg-white/95 backdrop-blur-md border border-gray-200 p-4 rounded-3xl shadow-2xl w-65 md:w-70"
               >
-                {/* แถบด้านบน (หัวข้อ + ปุ่มปิด) */}
                 <div className="flex justify-between items-center mb-3 px-1">
                   <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
-                    Smart Brain 555 faiz
+                    Smart Brain Faiz 555
                   </p>
                   <button
-                    onClick={() => setIsKeypadOpen(false)}
+                    onClick={toggleKeypad} // 👈 ใช้ฟังก์ชัน toggleKeypad แทน
                     className="text-gray-400 hover:text-red-500 font-bold w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 hover:bg-red-50 transition-colors"
                   >
                     ✕
                   </button>
                 </div>
 
-                {/* หน้าจอแสดงผลเลข */}
                 <div className="bg-gray-900 rounded-xl p-3 mb-4 h-14 flex items-center justify-center overflow-hidden shadow-inner">
                   <span className="text-red-500 font-mono text-2xl tracking-[0.3em] font-bold">
                     {displayCode ? (
@@ -230,7 +237,6 @@ export default function FaizHero() {
                   </span>
                 </div>
 
-                {/* แป้นตัวเลข */}
                 <div className="grid grid-cols-3 gap-2">
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
                     <button
@@ -266,14 +272,14 @@ export default function FaizHero() {
 
           {/* ปุ่มเปิด/ปิด แบบข้อความลับๆ */}
           <button
-            onClick={() => setIsKeypadOpen(!isKeypadOpen)}
+            onClick={toggleKeypad} // 👈 ใช้ฟังก์ชัน toggleKeypad แทน
             className={`text-xs font-mono font-semibold transition-colors px-3 py-1.5 rounded-full border border-transparent hover:border-gray-200 hover:bg-white/50 ${
               isKeypadOpen
                 ? "text-red-500"
                 : "text-gray-400/60 hover:text-gray-600"
             }`}
           >
-            {isKeypadOpen ? "[ CLOSE_SYS ]" : "[ SYS_READY 555 ]"}
+            {isKeypadOpen ? "[ CLOSE_SYS ]" : "[ SYS_READY 555 ENTER]"}
           </button>
         </div>
       )}
