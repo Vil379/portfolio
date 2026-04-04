@@ -4,7 +4,7 @@ import {blockContentType} from './blockContentType'
 import {categoryType} from './categoryType'
 import {postType} from './postType'
 import {authorType} from './authorType'
-import {projectType} from './project' // 👈 1. Import ไฟล์ project เข้ามา
+import {projectType} from './projectType' // 👈 1. Import ไฟล์ project เข้ามา
 
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [

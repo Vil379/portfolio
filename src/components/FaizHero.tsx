@@ -198,29 +198,77 @@ export default function FaizHero() {
               </AnimatePresence>
             </div>
           </div>
+          {/* ฝั่งขวา: รูปภาพ Premium พร้อมแอนิเมชันเรืองแสงและสลับร่างตามลำดับขั้น */}
           <div className="relative order-1 md:order-2 w-2/3 max-w-60 md:max-w-md mx-auto md:w-full md:pl-12 lg:pl-16">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
-              className={`relative aspect-4/5 rounded-4xl overflow-hidden transition-all duration-1000 ${isTransformed ? "grayscale border border-red-900/50 shadow-[0_0_40px_rgba(255,0,0,0.15)]" : "bg-card border border-border-card shadow-2xl"}`}
+              className={`relative aspect-4/5 rounded-4xl overflow-hidden transition-all duration-1000 ${
+                isTransformed
+                  ? "border border-red-900/50 shadow-[0_0_40px_rgba(255,0,0,0.15)]"
+                  : "bg-card border border-border-card shadow-2xl"
+              }`}
             >
-              <Image
-                src="/images/profile.jpg"
-                alt="Vil - Web Developer"
-                fill
-                className="object-cover"
-                priority
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              />
-              <AnimatePresence>
-                {isTransformed && (
+              {/* ใช้ AnimatePresence เพื่อทำแอนิเมชันตอนสลับรูปภาพ */}
+              <AnimatePresence mode="wait">
+                {/* ขั้นตอนที่ 1: แสดงรูป Profile (โหมดปกติ หรือ กำลัง Standing By) */}
+                {phase !== "complete" && (
                   <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 0.4 }}
-                    exit={{ opacity: 0 }}
-                    className="absolute inset-0 bg-red-600 mix-blend-multiply"
-                  />
+                    key="profile-image"
+                    initial={{ opacity: 1 }}
+                    exit={{ opacity: 0 }} // เฟดออกตอนสลับเป็นอวาตาร์
+                    transition={{ duration: 0.5 }}
+                    className="relative w-full h-full"
+                  >
+                    <Image
+                      src="/images/profile.jpg"
+                      alt="Vil - Web Developer"
+                      fill
+                      className="object-cover"
+                      priority
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
+                    {/* เอฟเฟกต์แสงสีแดงอาบตัว (โชว์เฉพาะตอน Standing By เท่านั้น) */}
+                    <AnimatePresence>
+                      {phase === "standing_by" && (
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: [0, 0.4, 0] }} // กระพริบช้าๆ เป็นจังหวะหัวใจ
+                          exit={{ opacity: 0 }}
+                          // 👇 ดีเลย์ 0.8 วินาที เพื่อให้เริ่มเรืองแสงพร้อมๆ กับที่เส้นแสงแนวตั้งวิ่งลงมาถึงตัว
+                          transition={{
+                            delay: 0.8,
+                            duration: 1.5,
+                            repeat: Infinity,
+                            repeatDelay: 0.5,
+                          }}
+                          className="absolute inset-0 bg-red-600 mix-blend-multiply"
+                        />
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                )}
+
+                {/* ขั้นตอนที่ 2: แสดงรูป Avatar (เมื่อแปลงร่างเสร็จสมบูรณ์) */}
+                {phase === "complete" && (
+                  <motion.div
+                    key="avatar-image"
+                    initial={{ opacity: 0 }} // เฟดเข้ามาหลังจากรูปโปรไฟล์หายไป
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }} // เฟดออกตอน Cancel Transform
+                    transition={{ duration: 0.8 }} // ค่อยๆ เฟดเข้าอย่างนุ่มนวล
+                    className="relative w-full h-full"
+                  >
+                    <Image
+                      src="/images/avatar.png"
+                      alt="Vil - Smart Brain OS Integrated Avatar"
+                      fill
+                      className="object-cover"
+                      priority
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
+                  </motion.div>
                 )}
               </AnimatePresence>
             </motion.div>
