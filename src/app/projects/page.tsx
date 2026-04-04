@@ -6,8 +6,9 @@ import Button from "@/src/components/ui/Button";
 export const revalidate = 10;
 
 async function getAllProjects() {
+  // 👇 1. เพิ่ม clientName และ liveUrl ใน Query
   const query = `*[_type == "project"] | order(_createdAt desc) {
-    _id, title, "slug": slug.current, description, mainImage, challenge, techStack
+    _id, title, "slug": slug.current, description, mainImage, challenge, techStack, clientName, liveUrl
   }`;
   return client.fetch(query);
 }
@@ -108,9 +109,9 @@ export default async function ProjectsPage() {
               <article
                 key={project._id}
                 id={project.slug}
-                className="bg-card border border-border-card rounded-4xl p-8 md:p-12 hover:shadow-xl transition-all duration-500 scroll-mt-28"
+                className="bg-card border border-border-card rounded-4xl p-8 md:p-12 hover:shadow-xl transition-all duration-500 scroll-mt-28 flex flex-col"
               >
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 flex-1">
                   <div className="lg:col-span-5 relative aspect-video md:aspect-square lg:aspect-4/3 bg-muted rounded-2xl overflow-hidden border border-border-card">
                     {project.mainImage ? (
                       <Image
@@ -126,13 +127,20 @@ export default async function ProjectsPage() {
                     )}
                   </div>
                   <div className="lg:col-span-7 flex flex-col justify-center">
+                    {/* 👇 2. เพิ่มป้ายชื่อ Client Name ถ้ามีข้อมูล */}
+                    {project.clientName && (
+                      <span className="text-xs font-bold text-blue-500 uppercase tracking-widest mb-3 block">
+                        {project.clientName}
+                      </span>
+                    )}
+
                     <h2 className="text-3xl font-extrabold mb-4 tracking-tight text-foreground">
                       {project.title}
                     </h2>
                     <p className="text-lg text-text-muted mb-8 leading-relaxed">
                       {project.description}
                     </p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-border-card pt-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-border-card pt-8 flex-1">
                       <div>
                         <h3 className="font-bold text-text-muted uppercase tracking-wider text-xs mb-4">
                           เทคโนโลยี
@@ -163,6 +171,20 @@ export default async function ProjectsPage() {
                         </p>
                       </div>
                     </div>
+
+                    {/* 👇 3. เพิ่มปุ่มลิงก์ไปเว็บจริง ถ้ามีการกรอก Live URL เอาไว้ */}
+                    {project.liveUrl && (
+                      <div className="mt-8 pt-6 border-t border-border-card/50">
+                        <Button
+                          href={project.liveUrl}
+                          target="_blank"
+                          variant="outline"
+                          size="sm"
+                        >
+                          เยี่ยมชมเว็บไซต์จริง &rarr;
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </article>
