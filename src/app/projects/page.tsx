@@ -1,12 +1,13 @@
+// src/app/projects/page.tsx
 import Image from "next/image";
 import { client } from "../../sanity/lib/client";
 import { urlFor } from "../../sanity/lib/image";
 import Button from "@/src/components/ui/Button";
+import ReadMoreText from "@/src/components/ReadMoreText"; // 👈 1. Import Component ใหม่เข้ามา
 
 export const revalidate = 10;
 
 async function getAllProjects() {
-  // 👇 1. เพิ่ม clientName และ liveUrl ใน Query
   const query = `*[_type == "project"] | order(_createdAt desc) {
     _id, title, "slug": slug.current, description, mainImage, challenge, techStack, clientName, liveUrl
   }`;
@@ -36,7 +37,7 @@ export default async function ProjectsPage() {
           <span className="h-px bg-border-card flex-1"></span>
         </div>
 
-        {/* Flagship คงความดำหรูหราไว้เสมอ */}
+        {/* Flagship */}
         <article className="bg-neutral-950 text-white rounded-[2.5rem] md:rounded-[3rem] p-8 md:p-16 shadow-2xl relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-125 h-125 bg-blue-600/20 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center relative z-10">
@@ -105,90 +106,96 @@ export default async function ProjectsPage() {
 
         <div className="space-y-16">
           {projects.length > 0 ? (
-            projects.map((project: any) => (
-              <article
-                key={project._id}
-                id={project.slug}
-                className="bg-card border border-border-card rounded-4xl p-8 md:p-12 hover:shadow-xl transition-all duration-500 scroll-mt-28 flex flex-col"
-              >
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 flex-1">
-                  <div className="lg:col-span-5 relative aspect-video md:aspect-square lg:aspect-4/3 bg-muted rounded-2xl overflow-hidden border border-border-card">
-                    {project.mainImage ? (
-                      <Image
-                        src={urlFor(project.mainImage).url()}
-                        alt={project.title}
-                        fill
-                        className="object-cover hover:scale-105 transition-transform duration-700"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center font-medium text-text-muted">
-                        ไม่มีรูปภาพ
-                      </div>
-                    )}
-                  </div>
-                  <div className="lg:col-span-7 flex flex-col justify-center">
-                    {/* 👇 2. เพิ่มป้ายชื่อ Client Name ถ้ามีข้อมูล */}
-                    {project.clientName && (
-                      <span className="text-xs font-bold text-blue-500 uppercase tracking-widest mb-3 block">
-                        {project.clientName}
-                      </span>
-                    )}
+            projects.map((project: any) => {
+              // 👇 2. โค้ดดักจับกรณีพิมพ์ Tech Stack ติดกันด้วยลูกน้ำ (Comma)
+              let techTags = project.techStack || [];
+              if (techTags.length === 1 && techTags[0].includes(",")) {
+                // ถ้ามีก้อนเดียวแต่ดันมีลูกน้ำ ให้หั่นแบ่งเป็นชิ้นๆ ซะเลย
+                techTags = techTags[0].split(",").map((t: string) => t.trim());
+              }
 
-                    <h2 className="text-3xl font-extrabold mb-4 tracking-tight text-foreground">
-                      {project.title}
-                    </h2>
-                    <p className="text-lg text-text-muted mb-8 leading-relaxed">
-                      {project.description}
-                    </p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-border-card pt-8 flex-1">
-                      <div>
-                        <h3 className="font-bold text-text-muted uppercase tracking-wider text-xs mb-4">
-                          เทคโนโลยี
-                        </h3>
-                        <div className="flex flex-wrap gap-2">
-                          {project.techStack?.length > 0 ? (
-                            project.techStack.map((t: string) => (
-                              <span
-                                key={t}
-                                className="bg-muted text-text-muted border border-border-card text-xs font-semibold px-3 py-1.5 rounded-md"
-                              >
-                                {t}
+              return (
+                <article
+                  key={project._id}
+                  id={project.slug}
+                  className="bg-card border border-border-card rounded-4xl p-8 md:p-12 hover:shadow-xl transition-all duration-500 scroll-mt-28 flex flex-col"
+                >
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 flex-1">
+                    <div className="lg:col-span-5 relative aspect-video md:aspect-square lg:aspect-4/3 bg-muted rounded-2xl overflow-hidden border border-border-card">
+                      {project.mainImage ? (
+                        <Image
+                          src={urlFor(project.mainImage).url()}
+                          alt={project.title}
+                          fill
+                          className="object-cover hover:scale-105 transition-transform duration-700"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center font-medium text-text-muted">
+                          ไม่มีรูปภาพ
+                        </div>
+                      )}
+                    </div>
+                    <div className="lg:col-span-7 flex flex-col justify-center">
+                      {project.clientName && (
+                        <span className="text-xs font-bold text-blue-500 uppercase tracking-widest mb-3 block">
+                          {project.clientName}
+                        </span>
+                      )}
+
+                      <h2 className="text-3xl font-extrabold mb-4 tracking-tight text-foreground">
+                        {project.title}
+                      </h2>
+                      <p className="text-lg text-text-muted mb-8 leading-relaxed">
+                        {project.description}
+                      </p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-border-card pt-8 flex-1">
+                        <div>
+                          <h3 className="font-bold text-text-muted uppercase tracking-wider text-xs mb-4">
+                            เทคโนโลยี
+                          </h3>
+                          <div className="flex flex-wrap gap-2">
+                            {techTags.length > 0 ? (
+                              techTags.map((t: string) => (
+                                <span
+                                  key={t}
+                                  className="bg-muted text-text-muted border border-border-card text-xs font-semibold px-3 py-1.5 rounded-md"
+                                >
+                                  {t}
+                                </span>
+                              ))
+                            ) : (
+                              <span className="text-text-muted text-sm">
+                                ไม่ได้ระบุ
                               </span>
-                            ))
-                          ) : (
-                            <span className="text-text-muted text-sm">
-                              ไม่ได้ระบุ
-                            </span>
-                          )}
+                            )}
+                          </div>
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-text-muted uppercase tracking-wider text-xs mb-4">
+                            ความท้าทาย
+                          </h3>
+                          {/* 👇 3. เรียกใช้ปุ่มอ่านเพิ่มเติมตรงนี้ */}
+                          <ReadMoreText text={project.challenge} />
                         </div>
                       </div>
-                      <div>
-                        <h3 className="font-bold text-text-muted uppercase tracking-wider text-xs mb-4">
-                          ความท้าทาย
-                        </h3>
-                        <p className="text-text-muted text-sm leading-relaxed line-clamp-4">
-                          {project.challenge || "กำลังอัปเดตข้อมูล..."}
-                        </p>
-                      </div>
-                    </div>
 
-                    {/* 👇 3. เพิ่มปุ่มลิงก์ไปเว็บจริง ถ้ามีการกรอก Live URL เอาไว้ */}
-                    {project.liveUrl && (
-                      <div className="mt-8 pt-6 border-t border-border-card/50">
-                        <Button
-                          href={project.liveUrl}
-                          target="_blank"
-                          variant="outline"
-                          size="sm"
-                        >
-                          เยี่ยมชมเว็บไซต์จริง &rarr;
-                        </Button>
-                      </div>
-                    )}
+                      {project.liveUrl && (
+                        <div className="mt-8 pt-6 border-t border-border-card/50">
+                          <Button
+                            href={project.liveUrl}
+                            target="_blank"
+                            variant="outline"
+                            size="sm"
+                          >
+                            เยี่ยมชมเว็บไซต์จริง &rarr;
+                          </Button>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </article>
-            ))
+                </article>
+              );
+            })
           ) : (
             <div className="text-center py-20 text-text-muted border border-dashed border-border-card rounded-2rem">
               ยังไม่มีผลงานลูกค้านะครับ สามารถเพิ่มได้จากระบบหลังบ้านเลย
