@@ -1,14 +1,36 @@
 // src/app/layout.tsx
-import "./globals.css";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import Navbar from "../components/Navbar"; // Import Navbar
+import Navbar from "@/src/components/Navbar";
+import Footer from "@/src/components/Footer";
+import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+// 👇 1. Import Vercel Analytics และ Speed Insights
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
-  title: "Vil | Professional Web Developer Freelance",
-  description: "ผู้เชี่ยวชาญการพัฒนา Next.js, React และ Web Solutions",
+  title: "Vil.dev | Freelance Web Developer",
+  description:
+    "รับออกแบบและพัฒนาเว็บไซต์ที่ตอบโจทย์ธุรกิจของคุณ ตั้งแต่หน้าเว็บ Portfolio ไปจนถึงระบบแพลตฟอร์มที่ซับซ้อน มุ่งเน้นประสิทธิภาพและประสบการณ์ที่ดีที่สุด",
+  keywords: [
+    "Web Developer",
+    "Freelance",
+    "รับทำเว็บไซต์",
+    "Next.js",
+    "React",
+    "สร้างเว็บพอร์ตโฟลิโอ",
+    "เชียงใหม่",
+  ],
+  metadataBase: new URL("https://vil.azeinx.com"),
+  openGraph: {
+    title: "Vil.dev | Freelance Web Developer",
+    description:
+      "รับออกแบบและพัฒนาเว็บไซต์ที่ตอบโจทย์ธุรกิจของคุณด้วยเทคโนโลยีระดับโลก",
+    url: "https://vil.azeinx.com",
+    siteName: "Vil.dev Portfolio",
+    locale: "th_TH",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -18,13 +40,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="th">
-      <body className={`${inter.className} bg-gray-50 text-gray-900`}>
-        <Navbar /> {/* ใส่ Navbar ตรงนี้ */}
-        <div className="pt-24 min-h-screen">
-          {" "}
-          {/* เว้นที่ให้ Navbar fixed */}
-          {children}
-        </div>
+      <body className="flex flex-col min-h-screen">
+        <Navbar />
+        <div className="flex-1">{children}</div>
+        <Footer />
+
+        {/* 👇 2. นำ Component มาวางไว้ล่างสุดของ body */}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

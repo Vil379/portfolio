@@ -222,7 +222,7 @@ export default function FaizHero() {
                     className="relative w-full h-full"
                   >
                     <Image
-                      src="/images/profile.jpg"
+                      src="/images/profile.png"
                       alt="Vil - Web Developer"
                       fill
                       className="object-cover"

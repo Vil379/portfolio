@@ -37,60 +37,72 @@ export default function ContactPage() {
   };
 
   return (
-    <main className="min-h-screen pt-32 pb-24 text-foreground">
-      <div className="max-w-6xl mx-auto px-6">
-        <section className="mb-16 md:mb-24 max-w-2xl">
-          <h1 className="text-5xl md:text-6xl font-extrabold mb-6 tracking-tight">
-            มาร่วมสร้างเว็บที่
-            <br />
-            ยอดเยี่ยมไปด้วยกัน
+    <main className="min-h-screen pt-24 pb-24 text-foreground">
+      {/* 💡 ปรับ max-w ให้แคบลงจาก 6xl เป็น 5xl เพื่อให้หน้าเว็บดูกระชับขึ้น */}
+      <div className="max-w-5xl mx-auto px-6">
+        {/* --- Header --- */}
+        <section className="mb-16 max-w-xl">
+          <h1 className="text-4xl md:text-5xl font-extrabold mb-4 tracking-tight">
+            มาร่วมสร้างเว็บที่ยอดเยี่ยม
           </h1>
-          <p className="text-xl text-text-muted leading-relaxed">
-            ไม่ว่าคุณจะมีไอเดียโปรเจกต์ใหม่
-            หรือต้องการอัปเกรดระบบเดิมให้เร็วและแรงขึ้น
+          <p className="text-lg text-text-muted leading-relaxed">
+            ไม่ว่าคุณจะมีไอเดียโปรเจกต์ใหม่ หรือต้องการอัปเกรดระบบเดิมให้ดีขึ้น
             ทักมาพูดคุยรายละเอียดเบื้องต้นกันก่อนได้เลยครับ
           </p>
         </section>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24">
-          <div className="lg:col-span-5 flex flex-col justify-between">
+        {/* 💡 ปรับช่องว่างตรงกลาง (gap) ให้แคบลง */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
+          {/* --- ฝั่งซ้าย: ข้อมูลการติดต่อ --- */}
+          {/* 💡 ปรับสัดส่วนให้ฝั่งซ้ายกินพื้นที่น้อยลง (4 ส่วน) */}
+          <div className="lg:col-span-4 flex flex-col justify-start pt-2">
             <div>
-              <h3 className="text-sm font-bold text-text-muted uppercase tracking-widest mb-6 block">
+              <h3 className="text-xs font-bold text-text-muted uppercase tracking-widest mb-6 flex items-center gap-3">
+                <span className="w-6 h-px bg-border-card block"></span>
                 ช่องทางการติดต่อ
               </h3>
-              <div className="space-y-8 mb-16">
+
+              <div className="space-y-6">
                 <div>
-                  <p className="text-text-muted text-sm mb-1">Email</p>
+                  <p className="text-text-muted text-xs mb-1 uppercase tracking-wider">
+                    Email
+                  </p>
                   <a
                     href="mailto:asawin22112545@gmail.com"
-                    className="text-2xl font-semibold text-foreground hover:text-text-muted transition-colors"
+                    className="text-lg font-medium text-foreground hover:text-text-muted transition-colors"
                   >
                     asawin22112545@gmail.com
                   </a>
                 </div>
                 <div>
-                  <p className="text-text-muted text-sm mb-1">Phone</p>
+                  <p className="text-text-muted text-xs mb-1 uppercase tracking-wider">
+                    Phone
+                  </p>
                   <a
                     href="tel:0932853472"
-                    className="text-2xl font-semibold text-foreground hover:text-text-muted transition-colors"
+                    className="text-lg font-medium text-foreground hover:text-text-muted transition-colors"
                   >
                     0932853472
                   </a>
                 </div>
                 <div>
-                  <p className="text-text-muted text-sm mb-1">LINE ID</p>
+                  <p className="text-text-muted text-xs mb-1 uppercase tracking-wider">
+                    LINE ID
+                  </p>
                   <a
                     href="https://line.me/ti/p/~@winwin3379"
                     target="_blank"
                     rel="noreferrer"
-                    className="text-2xl font-semibold text-foreground hover:text-[#00B900] transition-colors"
+                    className="text-lg font-medium text-foreground hover:text-[#00B900] transition-colors"
                   >
                     @winwin3379
                   </a>
                 </div>
                 <div>
-                  <p className="text-text-muted text-sm mb-1">Location</p>
-                  <p className="text-2xl font-semibold text-foreground">
+                  <p className="text-text-muted text-xs mb-1 uppercase tracking-wider">
+                    Location
+                  </p>
+                  <p className="text-lg font-medium text-foreground">
                     Chiang Mai, Thailand
                   </p>
                 </div>
@@ -98,13 +110,15 @@ export default function ContactPage() {
             </div>
           </div>
 
-          <div className="lg:col-span-7">
-            <div className="bg-card border border-border-card rounded-[2.5rem] p-8 md:p-12 shadow-2xl">
+          {/* --- ฝั่งขวา: ฟอร์มติดต่อ --- */}
+          {/* 💡 ปรับสัดส่วนฝั่งขวาให้ใหญ่ขึ้นนิดนึง (8 ส่วน) แต่ใช้ padding ในกล่องน้อยลง */}
+          <div className="lg:col-span-8">
+            <div className="bg-card border border-border-card rounded-3xl p-6 md:p-10 shadow-xl shadow-border-card/20">
               {isSubmitted ? (
-                <div className="text-center py-16">
-                  <div className="w-16 h-16 bg-green-50 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <div className="text-center py-12">
+                  <div className="w-12 h-12 bg-green-50 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
                     <svg
-                      className="w-8 h-8"
+                      className="w-6 h-6"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -117,27 +131,30 @@ export default function ContactPage() {
                       ></path>
                     </svg>
                   </div>
-                  <h3 className="text-3xl font-bold mb-4 tracking-tight text-foreground">
+                  <h3 className="text-2xl font-bold mb-2 tracking-tight text-foreground">
                     ส่งข้อความสำเร็จ!
                   </h3>
-                  <p className="text-text-muted mb-8">
+                  <p className="text-sm text-text-muted mb-6">
                     ขอบคุณที่ให้ความสนใจครับ
                     ผมจะรีบตอบกลับให้อีเมลของคุณให้เร็วที่สุด
                   </p>
                   <Button
                     onClick={() => setIsSubmitted(false)}
                     variant="outline"
+                    size="sm"
                   >
                     ส่งข้อความใหม่
                   </Button>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-8">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-2">
+                // 💡 ลดช่องว่างระหว่างบรรทัดในฟอร์ม (space-y-6)
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  {/* 💡 ในมือถือเรียงลงล่าง ในคอมแบ่ง 2 คอลัมน์ */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-1.5">
                       <label
                         htmlFor="name"
-                        className="text-sm font-semibold text-foreground"
+                        className="text-xs font-semibold text-text-muted uppercase tracking-wider"
                       >
                         ชื่อของคุณ
                       </label>
@@ -146,14 +163,14 @@ export default function ContactPage() {
                         id="name"
                         name="name"
                         required
-                        className="w-full bg-muted border border-border-card text-foreground text-base rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-foreground focus:border-transparent transition-all"
-                        placeholder="สมชาย"
+                        className="w-full bg-muted/50 border border-border-card text-foreground text-sm rounded-lg px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-foreground focus:border-foreground transition-all"
+                        placeholder="Vil Developer"
                       />
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-1.5">
                       <label
                         htmlFor="email"
-                        className="text-sm font-semibold text-foreground"
+                        className="text-xs font-semibold text-text-muted uppercase tracking-wider"
                       >
                         อีเมล
                       </label>
@@ -162,23 +179,23 @@ export default function ContactPage() {
                         id="email"
                         name="email"
                         required
-                        className="w-full bg-muted border border-border-card text-foreground text-base rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-foreground focus:border-transparent transition-all"
-                        placeholder="you@gmail.com"
+                        className="w-full bg-muted/50 border border-border-card text-foreground text-sm rounded-lg px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-foreground focus:border-foreground transition-all"
+                        placeholder="hello@example.com"
                       />
                     </div>
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     <label
                       htmlFor="service"
-                      className="text-sm font-semibold text-foreground"
+                      className="text-xs font-semibold text-text-muted uppercase tracking-wider"
                     >
                       บริการที่สนใจ
                     </label>
                     <select
                       id="service"
                       name="service"
-                      className="w-full bg-muted border border-border-card text-foreground text-base rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-foreground focus:border-transparent transition-all appearance-none"
+                      className="w-full bg-muted/50 border border-border-card text-foreground text-sm rounded-lg px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-foreground focus:border-foreground transition-all appearance-none cursor-pointer"
                     >
                       <option value="ไม่ระบุ">เลือกบริการเบื้องต้น</option>
                       <option value="Custom Website">
@@ -194,10 +211,10 @@ export default function ContactPage() {
                     </select>
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     <label
                       htmlFor="message"
-                      className="text-sm font-semibold text-foreground"
+                      className="text-xs font-semibold text-text-muted uppercase tracking-wider"
                     >
                       รายละเอียดโปรเจกต์
                     </label>
@@ -205,8 +222,8 @@ export default function ContactPage() {
                       id="message"
                       name="message"
                       required
-                      rows={5}
-                      className="w-full bg-muted border border-border-card text-foreground text-base rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-foreground focus:border-transparent transition-all resize-none"
+                      rows={4} // 💡 ลดขนาดกล่องข้อความลง
+                      className="w-full bg-muted/50 border border-border-card text-foreground text-sm rounded-lg px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-foreground focus:border-foreground transition-all resize-none"
                       placeholder="เล่าไอเดีย หรือเป้าหมายของโปรเจกต์ให้ผมฟังคร่าวๆ..."
                     ></textarea>
                   </div>
@@ -214,7 +231,7 @@ export default function ContactPage() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-foreground text-background font-medium text-lg rounded-xl px-8 py-4 hover:opacity-90 hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                    className="w-full md:w-auto bg-foreground text-background font-medium text-sm rounded-lg px-8 py-3 hover:opacity-90 hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                   >
                     {isSubmitting ? "กำลังส่งข้อความ..." : "ส่งข้อความ"}
                   </button>
