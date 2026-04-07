@@ -38,7 +38,7 @@ export default async function Home() {
               เพื่อให้มั่นใจว่าเว็บไซต์ของคุณจะโหลดเร็วติดจรวด ปลอดภัย
               และรองรับการขยายตัวในอนาคตได้อย่างไร้รอยต่อ
             </p>
-
+            {/*}
             <Button
               href="/resume.pdf"
               target="_blank"
@@ -60,10 +60,11 @@ export default async function Home() {
               </svg>
               ดู Resume ของผม
             </Button>
+            */}
           </div>
 
           {/* ฝั่งขวา: ป้ายชื่อเทคโนโลยีแบบ Sleek Pills */}
-          <div className="md:w-1/2 pt-2 md:pt-12">
+          <div className="md:w-1/2 ">
             <div className="flex flex-wrap gap-3">
               {[
                 "Next.js",
