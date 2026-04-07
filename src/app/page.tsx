@@ -17,7 +17,7 @@ export default async function Home() {
   const projects = await getProjects();
 
   return (
-    <main className="min-h-screen text-foreground pb-24">
+    <main className="min-h-screen text-foreground pt-24 md:pt-32 pb-24">
       {/* 1. Hero Section (ระบบแปลงร่าง) */}
       <FaizHero />
 

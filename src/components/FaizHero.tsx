@@ -124,7 +124,7 @@ export default function FaizHero() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-0 items-center">
           <div className="flex flex-col justify-center order-2 md:order-1 pl-10 md:pl-0 pr-0 md:pr-12 lg:pr-16">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 md:mb-6 tracking-tight">
-              สวัสดีครับ ผม Vil 👋
+              สวัสดีครับ ผม Vil 
             </h1>
             <h2
               className={`text-xl md:text-2xl lg:text-3xl font-medium tracking-tight mb-6 md:mb-8 transition-colors duration-1000 ${isTransformed ? "text-red-500 drop-shadow-[0_0_10px_rgba(239,68,68,0.8)]" : "text-text-muted"}`}
