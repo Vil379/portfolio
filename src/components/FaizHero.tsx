@@ -11,6 +11,30 @@ const playSound = (soundPath: string, volume: number = 0.4) => {
   audio.play().catch((err) => console.log("Audio play blocked:", err));
 };
 
+// 👇 1. เพิ่มฟังก์ชัน Custom Scroll ควบคุมความเร็วได้ตรงนี้ (นอก function FaizHero)
+const slowScrollToTop = (duration: number = 1500) => {
+  const startPosition = window.scrollY;
+  const startTime = performance.now();
+
+  // ฟังก์ชันคำนวณความหนืด (Ease In Out Cubic - เริ่มช้าๆ เร็วตรงกลาง แล้วจบช้าๆ)
+  const easeInOutCubic = (t: number) =>
+    t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+  const animateScroll = (currentTime: number) => {
+    const timeElapsed = currentTime - startTime;
+    const progress = Math.min(timeElapsed / duration, 1); // ห้ามเกิน 1
+    const easeProgress = easeInOutCubic(progress);
+
+    window.scrollTo(0, startPosition * (1 - easeProgress));
+
+    if (timeElapsed < duration) {
+      requestAnimationFrame(animateScroll);
+    }
+  };
+
+  requestAnimationFrame(animateScroll);
+};
+
 export default function FaizHero() {
   const [phase, setPhase] = useState<"idle" | "standing_by" | "complete">(
     "idle",
@@ -67,6 +91,9 @@ export default function FaizHero() {
   }, [phase, displayCode]);
 
   const triggerHenshin = () => {
+    // 👇 2. เรียกใช้ฟังก์ชันใหม่ และใส่ตัวเลขความเร็ว (1500 = 1.5 วินาที)
+    slowScrollToTop(1500);
+
     setPhase("standing_by");
     playSound("/sounds/standing_by.mp3", 0.6);
     setTimeout(() => {
@@ -102,74 +129,41 @@ export default function FaizHero() {
   const isTransformed = phase === "complete";
 
   return (
-    <section className="relative min-h-[70vh] flex items-center max-w-5xl mx-auto pb-32 md:pb-40 px-6 transition-colors duration-1000 z-10">
-      <AnimatePresence>
-        {isTransformed && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0, transition: { duration: 1 } }}
-            className="fixed inset-0 z-[-1] bg-neutral-950"
-          >
+    <>
+      <section className="relative min-h-[70vh] flex items-center max-w-5xl mx-auto pb-32 md:pb-40 px-6 transition-colors duration-1000 z-10">
+        <AnimatePresence>
+          {isTransformed && (
             <motion.div
-              initial={{ height: 0 }}
-              animate={{ height: "100vh" }}
-              exit={{ opacity: 0, transition: { duration: 0.5 } }}
-              transition={{ duration: 1.2, ease: "easeOut" }}
-              className="absolute left-6 md:left-1/2 top-0 w-1 md:w-1.5 -ml-0.5 md:-ml-0.75 bg-red-500 shadow-[0_0_20px_8px_rgba(255,0,0,0.8)]"
-            />
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: "100vw" }}
-              exit={{ opacity: 0, transition: { duration: 0.5 } }}
-              transition={{ duration: 1.5, ease: "easeInOut", delay: 0.8 }}
-              className="absolute top-16 left-0 h-1 md:h-1.5 bg-red-500 shadow-[0_0_20px_8px_rgba(255,0,0,0.8)] z-0"
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0, transition: { duration: 1 } }}
+              className="fixed inset-0 z-[-1] bg-neutral-950"
+            >
+              <motion.div
+                initial={{ height: 0 }}
+                animate={{ height: "100vh" }}
+                exit={{ opacity: 0, transition: { duration: 0.5 } }}
+                transition={{ duration: 1.2, ease: "easeOut" }}
+                className="absolute left-6 md:left-1/2 top-0 w-1 md:w-1.5 -ml-0.5 md:-ml-0.75 bg-red-500 shadow-[0_0_20px_8px_rgba(255,0,0,0.8)]"
+              />
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: "100vw" }}
+                exit={{ opacity: 0, transition: { duration: 0.5 } }}
+                transition={{ duration: 1.5, ease: "easeInOut", delay: 0.8 }}
+                className="absolute top-16 left-0 h-1 md:h-1.5 bg-red-500 shadow-[0_0_20px_8px_rgba(255,0,0,0.8)] z-0"
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-      <div
-        className={`transition-colors duration-1000 w-full relative z-10 ${isTransformed ? "text-white" : "text-foreground"}`}
-      >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-0 items-center">
-          <div className="flex flex-col justify-center order-2 md:order-1 pl-10 md:pl-0 pr-0 md:pr-12 lg:pr-16">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 md:mb-6 tracking-tight">
-              สวัสดีครับ ผม Vil
-            </h1>
-            <h2
-              className={`text-xl md:text-2xl lg:text-3xl font-medium tracking-tight mb-6 md:mb-8 transition-colors duration-1000 ${isTransformed ? "text-red-500 drop-shadow-[0_0_10px_rgba(239,68,68,0.8)]" : "text-text-muted"}`}
-            >
-              Freelance Web Developer
-            </h2>
-            <p
-              className={`text-base md:text-lg max-w-lg leading-relaxed mb-8 md:mb-10 transition-colors duration-1000 ${isTransformed ? "text-gray-300" : "text-text-muted"}`}
-            >
-              ผมรับออกแบบและพัฒนาเว็บไซต์ที่ตอบโจทย์ธุรกิจของคุณ ตั้งแต่หน้าเว็บ
-              Portfolio ไปจนถึงระบบแพลตฟอร์มที่ซับซ้อน มุ่งเน้นประสิทธิภาพ
-              ความรวดเร็ว และมอบประสบการณ์ที่ดีที่สุดให้กับผู้ใช้งาน
-            </p>
-            <div className="min-h-20">
-              <AnimatePresence mode="wait">
-                {phase === "idle" && (
-                  <motion.div
-                    key="idle-buttons"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="flex flex-wrap gap-4"
-                  >
-                    <Button href="/projects" size="md">
-                      ดูผลงานของผม
-                    </Button>
-                    <Button href="/contact" variant="outline" size="md">
-                      ติดต่องาน
-                    </Button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+        <div
+          className={`transition-colors duration-1000 w-full relative z-10 ${isTransformed ? "text-white" : "text-foreground"}`}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-0 items-center">
+            <div className="flex flex-col justify-center order-2 md:order-1 pl-10 md:pl-0 pr-0 md:pr-12 lg:pr-16">
               {phase === "standing_by" && (
-                <div className="h-full flex items-center">
+                <div className="mb-10 md:mb-12">
                   <motion.p
                     animate={{ opacity: [1, 0.3, 1] }}
                     transition={{ repeat: Infinity, duration: 0.8 }}
@@ -179,113 +173,150 @@ export default function FaizHero() {
                   </motion.p>
                 </div>
               )}
-              <AnimatePresence mode="wait">
-                {phase === "complete" && (
-                  <motion.div
-                    key="complete-ui"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ delay: 1.5 }}
-                    className="flex flex-col gap-4"
-                  >
-                    <div className="flex flex-wrap gap-4">
-                      <Button
-                        href="/projects"
-                        size="md"
-                        className="bg-red-600 hover:bg-red-700 text-white shadow-[0_0_20px_rgba(239,68,68,0.5)] border-none"
-                      >
-                        ดูผลงานทั้งหมด (System Overrided)
-                      </Button>
-                    </div>
-                    <button
-                      onClick={() => handleVirtualKey("Cancel")}
-                      className="w-fit text-xs md:text-sm font-mono text-red-500 hover:text-white border border-red-900/50 hover:bg-red-600/20 px-4 py-2 rounded-lg transition-colors"
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 md:mb-6 tracking-tight">
+                สวัสดีครับ ผม Vil
+              </h1>
+              <h2
+                className={`text-xl md:text-2xl lg:text-3xl font-medium tracking-tight mb-6 md:mb-8 transition-colors duration-1000 ${isTransformed ? "text-red-500 drop-shadow-[0_0_10px_rgba(239,68,68,0.8)]" : "text-text-muted"}`}
+              >
+                Freelance Web Developer
+              </h2>
+              <p
+                className={`text-base md:text-lg max-w-lg leading-relaxed mb-8 md:mb-10 transition-colors duration-1000 ${isTransformed ? "text-gray-300" : "text-text-muted"}`}
+              >
+                ผมรับออกแบบและพัฒนาเว็บไซต์ที่ตอบโจทย์ธุรกิจของคุณ
+                ตั้งแต่หน้าเว็บ Portfolio ไปจนถึงระบบแพลตฟอร์มที่ซับซ้อน
+                มุ่งเน้นประสิทธิภาพ ความรวดเร็ว
+                และมอบประสบการณ์ที่ดีที่สุดให้กับผู้ใช้งาน
+              </p>
+              <div className="min-h-20">
+                <AnimatePresence mode="wait">
+                  {phase === "idle" && (
+                    <motion.div
+                      key="idle-buttons"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="flex flex-wrap gap-4"
                     >
-                      [ DISCONNECT ]
-                    </button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                      <Button href="/projects" size="md">
+                        ดูผลงานของผม
+                      </Button>
+                      <Button href="/contact" variant="outline" size="md">
+                        ติดต่องาน
+                      </Button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                <AnimatePresence mode="wait">
+                  {phase === "complete" && (
+                    <motion.div
+                      key="complete-ui"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ delay: 1.5 }}
+                      className="flex flex-col gap-4"
+                    >
+                      <div className="flex flex-wrap gap-4">
+                        <Button
+                          href="/projects"
+                          size="md"
+                          className="bg-red-600 hover:bg-red-700 text-white shadow-[0_0_20px_rgba(239,68,68,0.5)] border-none"
+                        >
+                          ดูผลงานทั้งหมด (System Overrided)
+                        </Button>
+                      </div>
+                      <button
+                        onClick={() => handleVirtualKey("Cancel")}
+                        className="w-fit text-xs md:text-sm font-mono text-red-500 hover:text-white border border-red-900/50 hover:bg-red-600/20 px-4 py-2 rounded-lg transition-colors"
+                      >
+                        [ DISCONNECT ]
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+            {/* ฝั่งขวา: รูปภาพ Premium พร้อมแอนิเมชันเรืองแสงและสลับร่างตามลำดับขั้น */}
+            <div className="relative order-1 md:order-2 w-2/3 max-w-60 md:max-w-md mx-auto md:w-full md:pl-12 lg:pl-16">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                className={`relative aspect-4/5 rounded-4xl overflow-hidden transition-all duration-1000 ${
+                  isTransformed
+                    ? "border border-red-900/50 shadow-[0_0_40px_rgba(255,0,0,0.15)]"
+                    : "bg-card border border-border-card shadow-2xl"
+                }`}
+              >
+                {/* ใช้ AnimatePresence เพื่อทำแอนิเมชันตอนสลับรูปภาพ */}
+                <AnimatePresence mode="wait">
+                  {/* ขั้นตอนที่ 1: แสดงรูป Profile (โหมดปกติ หรือ กำลัง Standing By) */}
+                  {phase !== "complete" && (
+                    <motion.div
+                      key="profile-image"
+                      initial={{ opacity: 1 }}
+                      exit={{ opacity: 0 }} // เฟดออกตอนสลับเป็นอวาตาร์
+                      transition={{ duration: 0.5 }}
+                      className="relative w-full h-full"
+                    >
+                      <Image
+                        src="/images/profile.png"
+                        alt="Vil - Web Developer"
+                        fill
+                        className="object-cover"
+                        priority
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      />
+                      {/* เอฟเฟกต์แสงสีแดงอาบตัว (โชว์เฉพาะตอน Standing By เท่านั้น) */}
+                      <AnimatePresence>
+                        {phase === "standing_by" && (
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: [0, 0.4, 0] }} // กระพริบช้าๆ เป็นจังหวะหัวใจ
+                            exit={{ opacity: 0 }}
+                            // 👇 ดีเลย์ 0.8 วินาที เพื่อให้เริ่มเรืองแสงพร้อมๆ กับที่เส้นแสงแนวตั้งวิ่งลงมาถึงตัว
+                            transition={{
+                              delay: 0.8,
+                              duration: 1.5,
+                              repeat: Infinity,
+                              repeatDelay: 0.5,
+                            }}
+                            className="absolute inset-0 bg-red-600 mix-blend-multiply"
+                          />
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
+                  )}
+
+                  {/* ขั้นตอนที่ 2: แสดงรูป Avatar (เมื่อแปลงร่างเสร็จสมบูรณ์) */}
+                  {phase === "complete" && (
+                    <motion.div
+                      key="avatar-image"
+                      initial={{ opacity: 0 }} // เฟดเข้ามาหลังจากรูปโปรไฟล์หายไป
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }} // เฟดออกตอน Cancel Transform
+                      transition={{ duration: 0.8 }} // ค่อยๆ เฟดเข้าอย่างนุ่มนวล
+                      className="relative w-full h-full"
+                    >
+                      <Image
+                        src="/images/avatar.png"
+                        alt="Vil - Smart Brain OS Integrated Avatar"
+                        fill
+                        className="object-cover"
+                        priority
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
             </div>
           </div>
-          {/* ฝั่งขวา: รูปภาพ Premium พร้อมแอนิเมชันเรืองแสงและสลับร่างตามลำดับขั้น */}
-          <div className="relative order-1 md:order-2 w-2/3 max-w-60 md:max-w-md mx-auto md:w-full md:pl-12 lg:pl-16">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-              className={`relative aspect-4/5 rounded-4xl overflow-hidden transition-all duration-1000 ${
-                isTransformed
-                  ? "border border-red-900/50 shadow-[0_0_40px_rgba(255,0,0,0.15)]"
-                  : "bg-card border border-border-card shadow-2xl"
-              }`}
-            >
-              {/* ใช้ AnimatePresence เพื่อทำแอนิเมชันตอนสลับรูปภาพ */}
-              <AnimatePresence mode="wait">
-                {/* ขั้นตอนที่ 1: แสดงรูป Profile (โหมดปกติ หรือ กำลัง Standing By) */}
-                {phase !== "complete" && (
-                  <motion.div
-                    key="profile-image"
-                    initial={{ opacity: 1 }}
-                    exit={{ opacity: 0 }} // เฟดออกตอนสลับเป็นอวาตาร์
-                    transition={{ duration: 0.5 }}
-                    className="relative w-full h-full"
-                  >
-                    <Image
-                      src="/images/profile.png"
-                      alt="Vil - Web Developer"
-                      fill
-                      className="object-cover"
-                      priority
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    />
-                    {/* เอฟเฟกต์แสงสีแดงอาบตัว (โชว์เฉพาะตอน Standing By เท่านั้น) */}
-                    <AnimatePresence>
-                      {phase === "standing_by" && (
-                        <motion.div
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: [0, 0.4, 0] }} // กระพริบช้าๆ เป็นจังหวะหัวใจ
-                          exit={{ opacity: 0 }}
-                          // 👇 ดีเลย์ 0.8 วินาที เพื่อให้เริ่มเรืองแสงพร้อมๆ กับที่เส้นแสงแนวตั้งวิ่งลงมาถึงตัว
-                          transition={{
-                            delay: 0.8,
-                            duration: 1.5,
-                            repeat: Infinity,
-                            repeatDelay: 0.5,
-                          }}
-                          className="absolute inset-0 bg-red-600 mix-blend-multiply"
-                        />
-                      )}
-                    </AnimatePresence>
-                  </motion.div>
-                )}
-
-                {/* ขั้นตอนที่ 2: แสดงรูป Avatar (เมื่อแปลงร่างเสร็จสมบูรณ์) */}
-                {phase === "complete" && (
-                  <motion.div
-                    key="avatar-image"
-                    initial={{ opacity: 0 }} // เฟดเข้ามาหลังจากรูปโปรไฟล์หายไป
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }} // เฟดออกตอน Cancel Transform
-                    transition={{ duration: 0.8 }} // ค่อยๆ เฟดเข้าอย่างนุ่มนวล
-                    className="relative w-full h-full"
-                  >
-                    <Image
-                      src="/images/avatar.png"
-                      alt="Vil - Smart Brain OS Integrated Avatar"
-                      fill
-                      className="object-cover"
-                      priority
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-          </div>
         </div>
-      </div>
+      </section>
 
       {phase === "idle" && (
         <motion.div
@@ -384,6 +415,6 @@ export default function FaizHero() {
           </button>
         </motion.div>
       )}
-    </section>
+    </>
   );
 }
