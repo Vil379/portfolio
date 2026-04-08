@@ -22,7 +22,7 @@ export default async function Home() {
       <FaizHero />
 
       {/* 2. REFINED: Tech Stack & About Section (โปร่ง โล่ง สบายตา) */}
-      <section className="max-w-5xl mx-auto px-6 mb-32 md:mb-40 relative z-10">
+      <section className="max-w-5xl mx-auto pr-6 pl-12 md:px-6 mb-32 md:mb-40 relative z-10">
         <div className="flex flex-col md:flex-row gap-12 lg:gap-20 items-start">
           {/* ฝั่งซ้าย: คำโปรย */}
           <div className="md:w-1/2">
@@ -90,7 +90,7 @@ export default async function Home() {
       </section>
 
       {/* 3. Selected Projects Section */}
-      <section className="max-w-5xl mx-auto relative z-10 px-6">
+      <section className="max-w-5xl mx-auto relative z-10 pr-6 pl-12 md:px-6">
         <div className="flex items-center justify-between mb-12 pb-4">
           <h3 className="text-3xl font-bold tracking-tight">
             Selected Projects
@@ -107,25 +107,31 @@ export default async function Home() {
           {projects.map((project: any) => (
             <div
               key={project._id}
-              className="group border border-border-card rounded-4xl p-8 hover:shadow-xl hover:-translate-y-1 transition-all duration-500 flex flex-col h-full bg-card/90 backdrop-blur-sm"
+              // 👇 1. เอา hover:-translate-y-1 ออก กล่องจะนิ่งสนิท (เหลือแค่เงาเบาๆ)
+              className="group border border-border-card rounded-4xl p-8 hover:shadow-xl transition-shadow duration-500 flex flex-col h-full bg-card/90 backdrop-blur-sm"
             >
               <span className="text-xs font-semibold uppercase tracking-widest text-text-muted mb-6 block">
                 — Portfolio
               </span>
-              <h4 className="text-2xl font-bold mb-4 text-foreground group-hover:text-text-muted transition-colors tracking-tight">
+
+              {/* 👇 2. เอา group-hover:text-text-muted ออก สีชื่อโปรเจกต์จะไม่จางลงแล้ว */}
+              <h4 className="text-2xl font-bold mb-4 text-foreground tracking-tight">
                 {project.title}
               </h4>
+
               <p className="text-text-muted mb-8 leading-relaxed flex-auto text-sm md:text-base">
                 {project.description}
               </p>
+
               <Link
                 href={`/projects#${project.slug}`}
-                className="text-foreground font-semibold inline-flex items-center mt-auto group/link"
+                className="text-foreground font-semibold inline-flex items-center mt-auto"
               >
-                <span className="border-b border-transparent group-hover/link:border-foreground transition-colors pb-0.5">
+                {/* 👇 3. เปลี่ยนเป้าหมาย hover มาที่นี่: เมื่อชี้ที่กล่อง จะเกิดเส้นใต้ และลูกศรขยับไปทางขวา */}
+                <span className="border-b border-transparent group-hover:border-foreground transition-colors pb-0.5">
                   ดูรายละเอียด
                 </span>
-                <span className="ml-2 transform group-hover/link:translate-x-1 transition-transform">
+                <span className="ml-2 transform group-hover:translate-x-2 transition-transform duration-300">
                   &rarr;
                 </span>
               </Link>
