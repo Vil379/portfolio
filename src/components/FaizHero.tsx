@@ -8,26 +8,6 @@ import Image from "next/image";
 // 1. สร้าง Cache เก็บเสียง
 const audioCache: Record<string, HTMLAudioElement> = {};
 
-// 👇 2. ย้ายระบบโหลดเสียงมาไว้นอก Component (ทำงานทันทีที่โหลดไฟล์ JS)
-if (typeof window !== "undefined") {
-  const soundsToPreload = [
-    "/sounds/open.mp3",
-    "/sounds/beep.mp3",
-    "/sounds/standing_by.mp3",
-    "/sounds/complete.mp3",
-    "/sounds/deformation.mp3",
-  ];
-
-  soundsToPreload.forEach((src) => {
-    const audio = new Audio();
-    audio.src = src;
-    audio.preload = "auto";
-    // 💡 คำสั่ง .load() บังคับให้เบราว์เซอร์ดึงไฟล์มารอไว้เลย (ช่วยแก้ปัญหาใน Safari/iOS ได้ดีมาก)
-    audio.load();
-    audioCache[src] = audio;
-  });
-}
-
 const playSound = (soundPath: string, volume: number = 0.4) => {
   if (typeof window === "undefined") return;
 
@@ -40,30 +20,6 @@ const playSound = (soundPath: string, volume: number = 0.4) => {
   const clonedAudio = baseAudio.cloneNode() as HTMLAudioElement;
   clonedAudio.volume = volume;
   clonedAudio.play().catch((err) => console.log("Audio play blocked:", err));
-};
-
-// 👇 1. เพิ่มฟังก์ชัน Custom Scroll ควบคุมความเร็วได้ตรงนี้ (นอก function FaizHero)
-const slowScrollToTop = (duration: number = 1500) => {
-  const startPosition = window.scrollY;
-  const startTime = performance.now();
-
-  // ฟังก์ชันคำนวณความหนืด (Ease In Out Cubic - เริ่มช้าๆ เร็วตรงกลาง แล้วจบช้าๆ)
-  const easeInOutCubic = (t: number) =>
-    t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-
-  const animateScroll = (currentTime: number) => {
-    const timeElapsed = currentTime - startTime;
-    const progress = Math.min(timeElapsed / duration, 1); // ห้ามเกิน 1
-    const easeProgress = easeInOutCubic(progress);
-
-    window.scrollTo(0, startPosition * (1 - easeProgress));
-
-    if (timeElapsed < duration) {
-      requestAnimationFrame(animateScroll);
-    }
-  };
-
-  requestAnimationFrame(animateScroll);
 };
 
 export default function FaizHero() {
@@ -103,7 +59,26 @@ export default function FaizHero() {
   };
 
   useEffect(() => {
-    // 👇 คำใบ้ลับสำหรับ Developer ที่ชอบเปิด Console ดู (ของเดิม)
+    // 👇 1. Lazy Preload: รอ 2 วินาทีค่อยแอบโหลดเสียง เพื่อไม่ให้เว็บหน่วงตอนแรก
+    const timer = setTimeout(() => {
+      const soundsToPreload = [
+        "/sounds/open.mp3",
+        "/sounds/beep.mp3",
+        "/sounds/standing_by.mp3",
+        "/sounds/complete.mp3",
+        "/sounds/deformation.mp3",
+      ];
+
+      soundsToPreload.forEach((src) => {
+        if (!audioCache[src]) {
+          const audio = new Audio(src);
+          audio.preload = "auto"; // ให้เบราว์เซอร์ค่อยๆ โหลดอยู่เบื้องหลัง
+          audioCache[src] = audio;
+        }
+      });
+    }, 2000); // ดีเลย์ 2 วินาที (เปลี่ยนตัวเลขได้)
+
+    // 👇 2. ดักจับคีย์บอร์ด 5-5-5
     console.log(
       "%c[SMART BRAIN OS]%c Awaiting Input... Try code: 5-5-5 🏍️",
       "color: red; font-weight: bold; font-size: 14px;",
@@ -117,14 +92,17 @@ export default function FaizHero() {
         return;
       handleVirtualKey(e.key);
     };
+
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+
+    // 👇 3. อย่าลืม Cleanup
+    return () => {
+      clearTimeout(timer); // เคลียร์เวลา
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, [phase, displayCode]);
 
   const triggerHenshin = () => {
-    // 👇 2. เรียกใช้ฟังก์ชันใหม่ และใส่ตัวเลขความเร็ว (1500 = 1.5 วินาที)
-    slowScrollToTop(1500);
-
     setPhase("standing_by");
     playSound("/sounds/standing_by.mp3", 0.6);
     setTimeout(() => {
