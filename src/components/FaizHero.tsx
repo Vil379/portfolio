@@ -28,6 +28,30 @@ const playSound = (soundPath: string, volume: number = 0.4) => {
   clonedAudio.play().catch((err) => console.log("Audio play blocked:", err));
 };
 
+// 👇 1. เพิ่มฟังก์ชัน Custom Scroll ควบคุมความเร็วได้ตรงนี้ (นอก function FaizHero)
+const slowScrollToTop = (duration: number = 1500) => {
+  const startPosition = window.scrollY;
+  const startTime = performance.now();
+
+  // ฟังก์ชันคำนวณความหนืด (Ease In Out Cubic - เริ่มช้าๆ เร็วตรงกลาง แล้วจบช้าๆ)
+  const easeInOutCubic = (t: number) =>
+    t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+  const animateScroll = (currentTime: number) => {
+    const timeElapsed = currentTime - startTime;
+    const progress = Math.min(timeElapsed / duration, 1); // ห้ามเกิน 1
+    const easeProgress = easeInOutCubic(progress);
+
+    window.scrollTo(0, startPosition * (1 - easeProgress));
+
+    if (timeElapsed < duration) {
+      requestAnimationFrame(animateScroll);
+    }
+  };
+
+  requestAnimationFrame(animateScroll);
+};
+
 export default function FaizHero() {
   const [phase, setPhase] = useState<"idle" | "standing_by" | "complete">(
     "idle",
@@ -109,11 +133,12 @@ export default function FaizHero() {
   }, [isKeypadOpen]); // สั่งรันเมื่อ isKeypadOpen เปลี่ยนค่าเท่านั้น
 
   const triggerHenshin = () => {
+    slowScrollToTop(1500);
     setPhase("standing_by");
     playSound("/sounds/standing_by.mp3", 0.6);
     setTimeout(() => {
       setPhase("complete");
-      playSound("/sounds/complete.mp3", 0.6);
+      playSound("", 0.6);
     }, 3000);
   };
 
@@ -166,7 +191,7 @@ export default function FaizHero() {
                 animate={{ width: "100vw" }}
                 exit={{ opacity: 0, transition: { duration: 0.5 } }}
                 transition={{ duration: 1.5, ease: "easeInOut", delay: 0.8 }}
-                className="absolute top-16 left-0 h-1 md:h-1.5 bg-red-500 shadow-[0_0_20px_8px_rgba(255,0,0,0.8)] z-0"
+                className="absolute top-1/3 left-0 h-1 md:h-1.5 bg-red-500 shadow-[0_0_20px_8px_rgba(255,0,0,0.8)] z-0"
               />
             </motion.div>
           )}
