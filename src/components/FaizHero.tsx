@@ -28,30 +28,6 @@ const playSound = (soundPath: string, volume: number = 0.4) => {
   clonedAudio.play().catch((err) => console.log("Audio play blocked:", err));
 };
 
-// 👇 1. เพิ่มฟังก์ชัน Custom Scroll ควบคุมความเร็วได้ตรงนี้ (นอก function FaizHero)
-const slowScrollToTop = (duration: number = 1500) => {
-  const startPosition = window.scrollY;
-  const startTime = performance.now();
-
-  // ฟังก์ชันคำนวณความหนืด (Ease In Out Cubic - เริ่มช้าๆ เร็วตรงกลาง แล้วจบช้าๆ)
-  const easeInOutCubic = (t: number) =>
-    t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-
-  const animateScroll = (currentTime: number) => {
-    const timeElapsed = currentTime - startTime;
-    const progress = Math.min(timeElapsed / duration, 1); // ห้ามเกิน 1
-    const easeProgress = easeInOutCubic(progress);
-
-    window.scrollTo(0, startPosition * (1 - easeProgress));
-
-    if (timeElapsed < duration) {
-      requestAnimationFrame(animateScroll);
-    }
-  };
-
-  requestAnimationFrame(animateScroll);
-};
-
 export default function FaizHero() {
   const [phase, setPhase] = useState<"idle" | "standing_by" | "complete">(
     "idle",
@@ -133,12 +109,16 @@ export default function FaizHero() {
   }, [isKeypadOpen]); // สั่งรันเมื่อ isKeypadOpen เปลี่ยนค่าเท่านั้น
 
   const triggerHenshin = () => {
-    slowScrollToTop(1500);
+    // 👇 1. ใช้คำสั่งเลื่อนหน้าจอปกติของเบราว์เซอร์ (สมูทและไม่มีดีเลย์หน่วงเครื่อง)
+    window.scrollTo({ top: 0, behavior: "smooth" });
+
     setPhase("standing_by");
     playSound("/sounds/standing_by.mp3", 0.6);
+
     setTimeout(() => {
       setPhase("complete");
-      playSound("", 0.6);
+      // 👇 2. เติมชื่อไฟล์เสียงที่หายไปกลับคืนมา
+      playSound("/sounds/complete.mp3", 0.6);
     }, 3000);
   };
 
