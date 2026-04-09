@@ -6,7 +6,6 @@ import "./globals.css";
 
 // 👇 1. Import Vercel Analytics และ Speed Insights
 import { Analytics } from "@vercel/analytics/react";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   title: "Vil.dev | Freelance Web Developer",
@@ -47,7 +46,6 @@ export default function RootLayout({
 
         {/* 👇 2. นำ Component มาวางไว้ล่างสุดของ body */}
         <Analytics />
-        <SpeedInsights />
       </body>
     </html>
   );

@@ -19,6 +19,12 @@ const playSound = (soundPath: string, volume: number = 0.4) => {
 
   const clonedAudio = baseAudio.cloneNode() as HTMLAudioElement;
   clonedAudio.volume = volume;
+
+  // 👇 เพิ่มคำสั่งนี้: ทำลายไฟล์เสียงจำลองทิ้งทันทีเมื่อเล่นจบ เพื่อคืน Memory ให้เบราว์เซอร์
+  clonedAudio.onended = () => {
+    clonedAudio.remove();
+  };
+
   clonedAudio.play().catch((err) => console.log("Audio play blocked:", err));
 };
 
@@ -58,27 +64,8 @@ export default function FaizHero() {
     }
   };
 
+  // 👇 1. ระบบดักจับคีย์บอร์ด (ทำงานแยกอิสระ ไม่ดึงเครื่อง)
   useEffect(() => {
-    // 👇 1. Lazy Preload: รอ 2 วินาทีค่อยแอบโหลดเสียง เพื่อไม่ให้เว็บหน่วงตอนแรก
-    const timer = setTimeout(() => {
-      const soundsToPreload = [
-        "/sounds/open.mp3",
-        "/sounds/beep.mp3",
-        "/sounds/standing_by.mp3",
-        "/sounds/complete.mp3",
-        "/sounds/deformation.mp3",
-      ];
-
-      soundsToPreload.forEach((src) => {
-        if (!audioCache[src]) {
-          const audio = new Audio(src);
-          audio.preload = "auto"; // ให้เบราว์เซอร์ค่อยๆ โหลดอยู่เบื้องหลัง
-          audioCache[src] = audio;
-        }
-      });
-    }, 2000); // ดีเลย์ 2 วินาที (เปลี่ยนตัวเลขได้)
-
-    // 👇 2. ดักจับคีย์บอร์ด 5-5-5
     console.log(
       "%c[SMART BRAIN OS]%c Awaiting Input... Try code: 5-5-5 🏍️",
       "color: red; font-weight: bold; font-size: 14px;",
@@ -95,12 +82,31 @@ export default function FaizHero() {
 
     window.addEventListener("keydown", handleKeyDown);
 
-    // 👇 3. อย่าลืม Cleanup
     return () => {
-      clearTimeout(timer); // เคลียร์เวลา
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [phase, displayCode]);
+
+  // 👇 2. ระบบ Preload เสียง (ทำงาน "ครั้งเดียว" เมื่อกดปุ่มเปิดแป้นพิมพ์)
+  useEffect(() => {
+    if (isKeypadOpen) {
+      const soundsToPreload = [
+        "/sounds/open.mp3",
+        "/sounds/beep.mp3",
+        "/sounds/standing_by.mp3",
+        "/sounds/complete.mp3",
+        "/sounds/deformation.mp3",
+      ];
+
+      soundsToPreload.forEach((src) => {
+        if (!audioCache[src]) {
+          const audio = new Audio(src);
+          audio.preload = "auto";
+          audioCache[src] = audio;
+        }
+      });
+    }
+  }, [isKeypadOpen]); // สั่งรันเมื่อ isKeypadOpen เปลี่ยนค่าเท่านั้น
 
   const triggerHenshin = () => {
     setPhase("standing_by");
