@@ -118,7 +118,7 @@ export default function FaizHero() {
     setTimeout(() => {
       setPhase("complete");
       // 👇 2. เติมชื่อไฟล์เสียงที่หายไปกลับคืนมา
-      playSound("/sounds/complete.mp3", 0.6);
+      playSound("");
     }, 3000);
   };
 
