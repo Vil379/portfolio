@@ -5,10 +5,23 @@ import { motion, AnimatePresence } from "framer-motion";
 import Button from "./ui/Button";
 import Image from "next/image";
 
+const audioCache: Record<string, HTMLAudioElement> = {};
+
 const playSound = (soundPath: string, volume: number = 0.4) => {
-  const audio = new Audio(soundPath);
-  audio.volume = volume;
-  audio.play().catch((err) => console.log("Audio play blocked:", err));
+  // ป้องกัน Error ตอน Next.js ทำ Server-Side Rendering
+  if (typeof window === "undefined") return;
+
+  // ตรวจสอบว่ามีเสียงนี้ใน Cache หรือยัง ถ้ายังให้สร้างใหม่
+  let baseAudio = audioCache[soundPath];
+  if (!baseAudio) {
+    baseAudio = new Audio(soundPath);
+    audioCache[soundPath] = baseAudio;
+  }
+
+  // 💡 หัวใจสำคัญ: ใช้ cloneNode() เพื่อให้เล่นเสียงซ้อนทับกันได้ทันที (เช่น ตอนกดปุ่ม 555 รัวๆ)
+  const clonedAudio = baseAudio.cloneNode() as HTMLAudioElement;
+  clonedAudio.volume = volume;
+  clonedAudio.play().catch((err) => console.log("Audio play blocked:", err));
 };
 
 // 👇 1. เพิ่มฟังก์ชัน Custom Scroll ควบคุมความเร็วได้ตรงนี้ (นอก function FaizHero)
@@ -72,7 +85,21 @@ export default function FaizHero() {
   };
 
   useEffect(() => {
-    // 👇 คำใบ้ลับสำหรับ Developer ที่ชอบเปิด Console ดู
+    const soundsToPreload = [
+      "/sounds/open.mp3",
+      "/sounds/beep.mp3",
+      "/sounds/standing_by.mp3",
+      "/sounds/complete.mp3",
+      "/sounds/deformation.mp3",
+    ];
+
+    soundsToPreload.forEach((src) => {
+      const audio = new Audio(src);
+      audio.preload = "auto"; // บังคับให้เบราว์เซอร์โหลดไฟล์มารอ
+      audioCache[src] = audio;
+    });
+
+    // 👇 คำใบ้ลับสำหรับ Developer ที่ชอบเปิด Console ดู (ของเดิม)
     console.log(
       "%c[SMART BRAIN OS]%c Awaiting Input... Try code: 5-5-5 🏍️",
       "color: red; font-weight: bold; font-size: 14px;",
